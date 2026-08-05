@@ -10,58 +10,185 @@ await rm(outputDir, { recursive: true, force: true });
 await mkdir(serverDir, { recursive: true });
 await cp(resolve(root, "public"), resolve(outputDir, "public"), { recursive: true });
 await cp(resolve(root, ".openai"), resolve(outputDir, ".openai"), { recursive: true });
-await cp(resolve(root, "src/app.js"), resolve(serverDir, "app.js"));
-await cp(resolve(root, "src/config.js"), resolve(serverDir, "config.js"));
 await writeFile(
   resolve(serverDir, "index.js"),
-  `import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+  `const MAX_JSON_BYTES = 1_048_576;
+const startedAt = new Date();
 
-import { createApp } from "./app.js";
-import { loadConfig } from "./config.js";
-
-const publicDir = [
-  process.env.PUBLIC_DIR,
-  resolve(process.cwd(), "dist/public"),
-  resolve(process.cwd(), "public")
-].filter(Boolean).find((candidate) => existsSync(candidate));
-
-const config = {
-  ...loadConfig(),
-  publicDir: publicDir || resolve(process.cwd(), "public")
+export default {
+  fetch: handleRequest
 };
 
-const server = createApp({ config });
+export { handleRequest as fetch };
 
-server.on("error", (error) => {
-  console.error("Server failed to start", error);
-  process.exit(1);
-});
+async function handleRequest(request, env = {}) {
+  const requestId = getRequestId(request);
+  const url = new URL(request.url);
+  const baseHeaders = {
+    "X-Request-Id": requestId,
+    "X-Content-Type-Options": "nosniff",
+    ...buildCorsHeaders(env.CORS_ORIGIN)
+  };
 
-server.listen(config.port, config.host, () => {
-  console.log(\`\${config.serviceName} listening on http://\${config.host}:\${config.port}\`);
-});
-
-for (const signal of ["SIGINT", "SIGTERM"]) {
-  process.on(signal, () => shutdown(signal));
-}
-
-function shutdown(signal) {
-  console.log(\`\${signal} received, closing server\`);
-
-  server.close((error) => {
-    if (error) {
-      console.error("Server shutdown failed", error);
-      process.exit(1);
+  try {
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: {
+          ...baseHeaders,
+          "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type,X-Request-Id"
+        }
+      });
     }
 
-    process.exit(0);
-  });
+    if (request.method === "GET" && url.pathname === "/healthz") {
+      return sendJson(200, {
+        status: "ok",
+        service: env.SERVICE_NAME || "vitalcap-server",
+        timestamp: new Date().toISOString(),
+        uptimeSeconds: getUptimeSeconds()
+      }, baseHeaders);
+    }
 
-  setTimeout(() => {
-    console.error("Server shutdown timed out");
-    process.exit(1);
-  }, 10_000).unref();
+    if (request.method === "GET" && url.pathname === "/api/status") {
+      return sendJson(200, {
+        service: {
+          name: env.SERVICE_NAME || "vitalcap-server",
+          version: env.SERVICE_VERSION || "0.1.0",
+          environment: env.NODE_ENV || "production"
+        },
+        startedAt: startedAt.toISOString(),
+        nodeVersion: globalThis.process?.version || "edge-runtime",
+        uptimeSeconds: getUptimeSeconds()
+      }, baseHeaders);
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/echo") {
+      assertJsonRequest(request);
+      return sendJson(200, {
+        data: await readJsonBody(request),
+        requestId
+      }, baseHeaders);
+    }
+
+    const assetResponse = await serveAsset(request, env, url);
+
+    if (assetResponse) {
+      return withHeaders(assetResponse, baseHeaders);
+    }
+
+    return sendJson(404, {
+      error: {
+        code: "not_found",
+        message: "No route for " + request.method + " " + url.pathname
+      }
+    }, baseHeaders);
+  } catch (error) {
+    if (error instanceof HttpError) {
+      return sendJson(error.statusCode, {
+        error: {
+          code: error.code,
+          message: error.message
+        }
+      }, baseHeaders);
+    }
+
+    console.error(error);
+    return sendJson(500, {
+      error: {
+        code: "internal_server_error",
+        message: "Unexpected server error"
+      }
+    }, baseHeaders);
+  }
+}
+
+async function serveAsset(request, env, url) {
+  if ((request.method !== "GET" && request.method !== "HEAD") || !env.ASSETS?.fetch) {
+    return null;
+  }
+
+  const assetUrl = new URL(url);
+
+  if (assetUrl.pathname === "/") {
+    assetUrl.pathname = "/index.html";
+  }
+
+  const response = await env.ASSETS.fetch(new Request(assetUrl, request));
+  return response.status === 404 ? null : response;
+}
+
+function assertJsonRequest(request) {
+  const contentType = request.headers.get("content-type") || "";
+
+  if (!contentType.toLowerCase().includes("application/json")) {
+    throw new HttpError(415, "unsupported_media_type", "Content-Type must be application/json");
+  }
+}
+
+async function readJsonBody(request) {
+  const body = await request.text();
+
+  if (new TextEncoder().encode(body).byteLength > MAX_JSON_BYTES) {
+    throw new HttpError(413, "payload_too_large", "Request body is too large");
+  }
+
+  if (body.trim() === "") {
+    return {};
+  }
+
+  try {
+    return JSON.parse(body);
+  } catch {
+    throw new HttpError(400, "invalid_json", "Request body must be valid JSON");
+  }
+}
+
+function sendJson(status, body, headers = {}) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...headers,
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store"
+    }
+  });
+}
+
+function withHeaders(response, headers) {
+  const mergedHeaders = new Headers(response.headers);
+
+  for (const [header, value] of Object.entries(headers)) {
+    mergedHeaders.set(header, value);
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: mergedHeaders
+  });
+}
+
+function buildCorsHeaders(origin) {
+  return origin ? { "Access-Control-Allow-Origin": origin, "Vary": "Origin" } : {};
+}
+
+function getRequestId(request) {
+  return request.headers.get("x-request-id") || globalThis.crypto?.randomUUID?.() || String(Math.random());
+}
+
+function getUptimeSeconds() {
+  return Math.round((Date.now() - startedAt.getTime()) / 1000);
+}
+
+class HttpError extends Error {
+  constructor(statusCode, code, message) {
+    super(message);
+    this.name = "HttpError";
+    this.statusCode = statusCode;
+    this.code = code;
+  }
 }
 `
 );
