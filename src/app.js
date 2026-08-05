@@ -1,11 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { readFile, stat } from "node:fs/promises";
 import { createServer } from "node:http";
-import { dirname, extname, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { extname, resolve, sep } from "node:path";
 
 const MAX_JSON_BYTES = 1_048_576;
-const DEFAULT_PUBLIC_DIR = resolve(dirname(fileURLToPath(import.meta.url)), "../public");
+const DEFAULT_PUBLIC_DIR = "public";
 
 export function createApp({ config = {}, logger = console, now = () => new Date() } = {}) {
   const startedAt = now();
