@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VitalCap | AI Business Continuity Planning</title>
+    <meta
+      name="description"
+      content="VitalCap is an AI-powered business continuity planning platform for live threat analysis, dependency mapping, and recovery recommendations."
+    >
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css?v=20260805-live-threat">
+    <script src="/app.js?v=20260805-live-threat" defer></script>
+  </head>
+  <body>
+    <header class="site-header" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="VitalCap home">VitalCap</a>
+      <nav class="site-nav" aria-label="Sections">
+        <a href="#platform">Platform</a>
+        <a href="#workflow">Workflow</a>
+        <a href="#risk">Risk</a>
+        <a href="#founder">Founder</a>
+        <a href="#simulator">Simulator</a>
+      </nav>
+      <a class="header-link" href="#contact">Contact us</a>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-map" src="/assets/risk-map.png" alt="">
+        <div class="hero-content">
+          <p class="eyebrow">AI Business Continuity Planning</p>
+          <h1 id="hero-title">VitalCap</h1>
+          <p class="hero-lead">
+            Live continuity planning that connects business processes, workforce criticality,
+            application dependencies, and location-specific threats.
+          </p>
+          <div class="hero-actions" aria-label="Primary actions">
+            <a class="button button-primary" href="#risk">View Risk Model</a>
+            <a class="button button-secondary" href="#recovery">Recovery Plan</a>
+          </div>
+          <dl class="hero-facts" aria-label="Service details">
+            <div>
+              <dt>Focus</dt>
+              <dd>BCP automation</dd>
+            </div>
+            <div>
+              <dt>Signals</dt>
+              <dd>People, apps, threats</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd id="api-status">Checking API</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="section intro-section" id="founder" aria-labelledby="founder-title">
+        <div class="section-copy">
+          <p class="eyebrow">Introduction</p>
+          <h2 id="founder-title">Built by continuity and risk experience.</h2>
+          <p>
+            Oriya Baraness is a security and risk management professional specializing
+            in business continuity and disaster recovery. Her work spans continuity
+            coordination, infrastructure protection, and practical resilience planning.
+          </p>
+          <p>
+            VitalCap turns that discipline into a living SaaS workflow for organizations
+            that need continuity plans to stay current before a crisis.
+          </p>
+        </div>
+        <figure class="founder-figure">
+          <img src="/assets/founder-oriyabaraness.png" alt="Oriya Baraness, founder of VitalCap">
+          <figcaption>Founder: Oriya Baraness</figcaption>
+        </figure>
+      </section>
+
+      <section class="section simulator-section" id="simulator" aria-labelledby="simulator-title">
+        <div class="section-heading">
+          <p class="eyebrow">Simulator</p>
+          <h2 id="simulator-title">Run a domino-effect continuity scenario.</h2>
+        </div>
+
+        <div class="simulator-layout">
+          <form class="simulator-controls" aria-label="Continuity simulator controls">
+            <label class="field" for="sim-process">
+              <span>Business process</span>
+              <select id="sim-process">
+                <option value="sales">Sales settlement</option>
+                <option value="payments">Vendor payments</option>
+                <option value="reporting">Client reporting</option>
+                <option value="payroll">Payroll processing</option>
+              </select>
+            </label>
+
+            <label class="field" for="sim-region">
+              <span>Region</span>
+              <select id="sim-region">
+                <option value="telaviv">Tel Aviv</option>
+                <option value="shibuya">Shibuya</option>
+                <option value="toronto">Toronto</option>
+                <option value="london">London</option>
+              </select>
+            </label>
+
+            <label class="field" for="sim-threat">
+              <span>Threat</span>
+              <select id="sim-threat">
+                <option value="appOutage">Critical app outage</option>
+                <option value="earthquake">Regional seismic event</option>
+                <option value="supplier">Supplier disruption</option>
+                <option value="flood">Data center flood risk</option>
+                <option value="workforce">Workforce disruption</option>
+              </select>
+            </label>
+
+            <label class="field slider-field" for="sim-workforce">
+              <span>Workforce available <strong id="sim-workforce-output">85%</strong></span>
+              <input id="sim-workforce" type="range" min="30" max="100" step="5" value="85">
+            </label>
+
+            <label class="field slider-field" for="sim-supplier">
+              <span>Supplier confidence <strong id="sim-supplier-output">70%</strong></span>
+              <input id="sim-supplier" type="range" min="20" max="100" step="5" value="70">
+            </label>
+
+          </form>
+
+          <aside class="application-panel" aria-labelledby="sim-applications-title">
+            <div class="application-panel-header">
+              <p class="eyebrow">Applications</p>
+              <h3 id="sim-applications-title">Process application stack</h3>
+            </div>
+            <div
+              class="application-options"
+              id="sim-application-options"
+              role="radiogroup"
+              aria-label="Application options"
+            ></div>
+          </aside>
+
+          <div class="simulator-results" aria-live="polite">
+            <div class="score-panel">
+              <p class="output-label">Scenario Score</p>
+              <strong id="sim-score">0</strong>
+              <span id="sim-band">Calculating</span>
+              <div class="score-meter" aria-hidden="true">
+                <span id="sim-meter"></span>
+              </div>
+            </div>
+
+            <dl class="sim-metrics" aria-label="Calculated continuity values">
+              <div>
+                <dt>RTO</dt>
+                <dd id="sim-rto">0 hours</dd>
+              </div>
+              <div>
+                <dt>RPO</dt>
+                <dd id="sim-rpo">0 hours</dd>
+              </div>
+              <div>
+                <dt>MAD</dt>
+                <dd id="sim-mad">0 hours</dd>
+              </div>
+            </dl>
+
+            <div class="sim-context">
+              <p>
+                <strong id="sim-dependency">Dependency</strong>
+                <span id="sim-context-text">Scenario context will appear here.</span>
+              </p>
+            </div>
+
+            <div class="sim-recommendation">
+              <h3>Recommended action</h3>
+              <p id="sim-action">Run the simulator to calculate a response path.</p>
+            </div>
+          </div>
+
+          <section class="domino-panel" aria-labelledby="sim-domino-title">
+            <div class="domino-header">
+              <div>
+                <p class="eyebrow">Domino effect</p>
+                <h3 id="sim-domino-title">Dependency cascade</h3>
+              </div>
+              <button class="button button-secondary domino-replay" id="sim-domino-replay" type="button">
+                Replay cascade
+              </button>
+            </div>
+
+            <div class="domino-stage" aria-label="Dependency domino path">
+              <div class="domino-track" id="sim-domino-stage"></div>
+            </div>
+
+            <dl class="domino-summary" aria-label="Domino effect summary">
+              <div>
+                <dt>First impact</dt>
+                <dd id="sim-domino-first">-</dd>
+              </div>
+              <div>
+                <dt>Cascade depth</dt>
+                <dd id="sim-domino-depth">-</dd>
+              </div>
+              <div>
+                <dt>Recovery window</dt>
+                <dd id="sim-domino-window">-</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </section>
+
+      <section class="section" id="platform" aria-labelledby="platform-title">
+        <div class="section-heading">
+          <p class="eyebrow">Platform</p>
+          <h2 id="platform-title">From static BCP files to living continuity intelligence.</h2>
+        </div>
+
+        <div class="two-column">
+          <div>
+            <h3>Core failures of traditional BCP</h3>
+            <div class="panel-grid">
+              <article class="dark-panel">
+                <h4>Fragmented sources</h4>
+                <p>Coordinators pull from workforce, process, application, and third-party data manually.</p>
+              </article>
+              <article class="dark-panel">
+                <h4>Information gaps</h4>
+                <p>Departments update at different speeds, leaving delays and missing dependencies.</p>
+              </article>
+              <article class="dark-panel">
+                <h4>Generic risk views</h4>
+                <p>Plans often miss threats that are specific to the organization and franchise.</p>
+              </article>
+              <article class="dark-panel">
+                <h4>Annual maintenance</h4>
+                <p>BCP documents are refreshed after crisis or audit cycles instead of continuously.</p>
+              </article>
+            </div>
+          </div>
+
+          <div>
+            <h3>The VitalCap solution</h3>
+            <div class="panel-grid">
+              <article class="solution-panel">
+                <h4>Automated plan building</h4>
+                <p>Combines the core data needed to produce recovery-ready continuity plans.</p>
+              </article>
+              <article class="solution-panel">
+                <h4>Risk calculation</h4>
+                <p>Uses MAD, RTO, RPO, and application criticality to score business impact.</p>
+              </article>
+              <article class="solution-panel">
+                <h4>Threat monitoring</h4>
+                <p>Analyzes real-time threats to single points of failure with open-source signals.</p>
+              </article>
+              <article class="solution-panel">
+                <h4>Recovery strategy</h4>
+                <p>Recommends actions based on resources, capabilities, dependencies, and industry.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="market-band" aria-labelledby="market-title">
+        <div>
+          <p class="eyebrow">Market Opportunity</p>
+          <h2 id="market-title">Continuity teams are being asked to move faster.</h2>
+        </div>
+        <p>
+          Business continuity management solutions are projected to expand by USD 1.17B
+          between 2024 and 2028, driven by demand for stronger resilience and operational
+          stability across industries.
+        </p>
+      </section>
+
+      <section class="section workflow-section" id="workflow" aria-labelledby="workflow-title">
+        <div class="section-heading">
+          <p class="eyebrow">Workflow</p>
+          <h2 id="workflow-title">Application dependency mapping with RTO and RPO logic.</h2>
+        </div>
+        <div class="workflow-layout">
+          <img class="dependency-image" src="/assets/dependency-flow.png" alt="Internal and external dependency flow across payments, liquidity, accounts, clients, sales, reporting, and legal">
+          <div class="output-panel" aria-label="Sample continuity output">
+            <p class="output-label">Sample Output</p>
+            <h3>CyberAgent</h3>
+            <dl class="output-list">
+              <div>
+                <dt>Application RTO</dt>
+                <dd>4 hours</dd>
+              </div>
+              <div>
+                <dt>Application RPO</dt>
+                <dd>2 hours</dd>
+              </div>
+              <div>
+                <dt>Critical processing</dt>
+                <dd>23:00 transaction settlements</dd>
+              </div>
+              <div>
+                <dt>Internal dependency</dt>
+                <dd>Sales process MAD: 4 hours</dd>
+              </div>
+              <div>
+                <dt>External dependency</dt>
+                <dd>Cloud infrastructure for reporting and alerting services</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section class="section risk-section" id="risk" aria-labelledby="risk-title">
+        <div class="section-heading">
+          <p class="eyebrow">Risk Calculator</p>
+          <h2 id="risk-title">Criticality changes as time horizons expand.</h2>
+        </div>
+        <div class="risk-layout">
+          <div class="calculator" aria-label="Risk calculator">
+            <div class="segmented-control" aria-label="Time horizon">
+              <button class="segment is-active" type="button" data-time="4">4 Hours</button>
+              <button class="segment" type="button" data-time="24">24 Hours</button>
+              <button class="segment" type="button" data-time="48">48 Hours</button>
+            </div>
+            <div class="bar-chart" aria-label="Risk factors">
+              <div class="bar-row">
+                <span>Reputational</span>
+                <div class="bar-track"><span class="bar-value" data-risk="reputational"></span></div>
+              </div>
+              <div class="bar-row">
+                <span>Legal</span>
+                <div class="bar-track"><span class="bar-value" data-risk="legal"></span></div>
+              </div>
+              <div class="bar-row">
+                <span>Regulatory</span>
+                <div class="bar-track"><span class="bar-value" data-risk="regulatory"></span></div>
+              </div>
+              <div class="bar-row">
+                <span>Internal</span>
+                <div class="bar-track"><span class="bar-value" data-risk="internal"></span></div>
+              </div>
+            </div>
+          </div>
+          <aside class="risk-summary">
+            <span class="status-dot"></span>
+            <p>
+              The tool highlights applications used across business lines and folds
+              dependencies into MAD, RTO, and RPO calculations.
+            </p>
+            <strong>Recommended MAD for Sales: <span id="mad-output">4 Hours</span></strong>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section threat-section" aria-labelledby="threat-title">
+        <div class="threat-copy">
+          <p class="eyebrow">Risk and Threat Analysis</p>
+          <h2 id="threat-title">Geo-specific threat monitoring for each franchise.</h2>
+          <p>
+            VitalCap can detect regional events, supplier exposure, application
+            dependencies, and team-level criticality before they become continuity failures.
+          </p>
+        </div>
+        <div class="threat-map-live" aria-label="Live regional threat monitor">
+          <img class="map-image" src="/assets/risk-map.png" alt="Global threat monitoring map with regional markers">
+          <svg class="threat-routes" viewBox="0 0 750 358" aria-hidden="true">
+            <path data-threat-route="1" d="M548 86 C570 112 616 121 650 142"></path>
+            <path data-threat-route="2" d="M650 142 C623 167 587 184 544 196"></path>
+            <path data-threat-route="3" d="M544 196 C492 204 451 187 402 155"></path>
+            <path data-threat-route="4" d="M402 155 C351 127 299 109 229 96"></path>
+          </svg>
+          <span class="threat-marker" data-threat-marker="1" style="--x: 73%; --y: 22%;"></span>
+          <span class="threat-marker" data-threat-marker="2" style="--x: 87%; --y: 42%;"></span>
+          <span class="threat-marker" data-threat-marker="3" style="--x: 72%; --y: 58%;"></span>
+          <span class="threat-marker" data-threat-marker="4" style="--x: 54%; --y: 39%;"></span>
+          <span class="threat-marker" data-threat-marker="2" style="--x: 34%; --y: 49%;"></span>
+          <span class="threat-marker" data-threat-marker="3" style="--x: 21%; --y: 35%;"></span>
+          <div class="threat-live-panel" aria-live="polite">
+            <p>Live threat feed</p>
+            <strong id="threat-live-title">Scanning Shibuya region</strong>
+            <span id="threat-live-detail">Monitoring seismic, supplier, and application dependency signals.</span>
+          </div>
+        </div>
+        <div class="threat-timeline" aria-label="Threat analysis sample">
+          <article data-threat-step="1">
+            <span>1</span>
+            <p>Language model monitors active threats near Shibuya, Japan.</p>
+          </article>
+          <article data-threat-step="2">
+            <span>2</span>
+            <p>Supplier data identifies CyberAgent headquarters exposure.</p>
+          </article>
+          <article data-threat-step="3">
+            <span>3</span>
+            <p>Sales payment transfer dependencies are connected to CyberAgent.</p>
+          </article>
+          <article data-threat-step="4">
+            <span>4</span>
+            <p>VitalCap warns the team that RTO, RPO, and MAD thresholds are at risk.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section recovery-section" id="recovery" aria-labelledby="recovery-title">
+        <div class="recovery-alert" aria-hidden="true">!</div>
+        <div>
+          <p class="eyebrow">Recovery Recommendations</p>
+          <h2 id="recovery-title">Action paths tied to time, client risk, and legal exposure.</h2>
+          <p>
+            The recommendation layer turns risk calculations into operational steps:
+            communications, backup activation, alternate suppliers, and testing cycles.
+          </p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time Plan</th>
+                <th>Client Risk</th>
+                <th>Legal</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Time Plan">2 Hour</td>
+                <td data-label="Client Risk">4</td>
+                <td data-label="Legal">8</td>
+                <td data-label="Action">Back up sales data and send client communications.</td>
+              </tr>
+              <tr>
+                <td data-label="Time Plan">4 Hour</td>
+                <td data-label="Client Risk">4</td>
+                <td data-label="Legal">8</td>
+                <td data-label="Action">Switch to alternative sales platforms and activate short-term suppliers.</td>
+              </tr>
+              <tr>
+                <td data-label="Time Plan">24 Hour</td>
+                <td data-label="Client Risk">4</td>
+                <td data-label="Legal">8</td>
+                <td data-label="Action">Implement interim customer support measures with dedicated staff.</td>
+              </tr>
+              <tr>
+                <td data-label="Time Plan">48 Hour</td>
+                <td data-label="Client Risk">4</td>
+                <td data-label="Legal">8</td>
+                <td data-label="Action">Review testing results and adjust continuity strategies.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="value-section" aria-labelledby="value-title">
+        <p class="eyebrow">Unique Value Position</p>
+        <h2 id="value-title">
+          AI-powered SaaS for real-time threat analysis, employee criticality,
+          and application dependency mapping.
+        </h2>
+        <p>
+          VitalCap dynamically adapts to evolving threats so organizations can
+          preemptively adjust continuity plans, reduce exposure, and strengthen resilience.
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="contact">
+      <div>
+        <strong>VitalCap</strong>
+        <p>Tel Aviv, Israel</p>
+      </div>
+      <a href="tel:+972548222991">054-8222991</a>
+    </footer>
+  </body>
+</html>
