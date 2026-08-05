@@ -1,24 +1,24 @@
-import { cp, mkdir, rm, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { dirname, extname, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+const publicDir = resolve(root, "public");
 const outputDir = resolve(root, "dist");
 const serverDir = resolve(outputDir, "server");
+const staticAssets = await buildStaticAssets(publicDir);
 
 await rm(outputDir, { recursive: true, force: true });
 await mkdir(serverDir, { recursive: true });
-await cp(resolve(root, "public"), resolve(outputDir, "public"), { recursive: true });
+await cp(publicDir, resolve(outputDir, "public"), { recursive: true });
 await cp(resolve(root, ".openai"), resolve(outputDir, ".openai"), { recursive: true });
 await writeFile(
   resolve(serverDir, "index.js"),
   `const MAX_JSON_BYTES = 1_048_576;
+const STATIC_ASSETS = ${JSON.stringify(staticAssets)};
 const startedAt = new Date();
 
-export default {
-  fetch: handleRequest
-};
-
+export default handleRequest;
 export { handleRequest as fetch };
 
 async function handleRequest(request, env = {}) {
@@ -105,7 +105,17 @@ async function handleRequest(request, env = {}) {
 }
 
 async function serveAsset(request, env, url) {
-  if ((request.method !== "GET" && request.method !== "HEAD") || !env.ASSETS?.fetch) {
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return null;
+  }
+
+  const embeddedResponse = serveEmbeddedAsset(request, url);
+
+  if (embeddedResponse) {
+    return embeddedResponse;
+  }
+
+  if (!env.ASSETS?.fetch) {
     return null;
   }
 
@@ -117,6 +127,38 @@ async function serveAsset(request, env, url) {
 
   const response = await env.ASSETS.fetch(new Request(assetUrl, request));
   return response.status === 404 ? null : response;
+}
+
+function serveEmbeddedAsset(request, url) {
+  const pathname = normalizeAssetPath(url.pathname);
+  const asset = STATIC_ASSETS[pathname];
+
+  if (!asset) {
+    return null;
+  }
+
+  return new Response(request.method === "HEAD" ? null : decodeBase64(asset.body), {
+    headers: {
+      "Content-Type": asset.contentType,
+      "Cache-Control": asset.cacheControl
+    }
+  });
+}
+
+function normalizeAssetPath(pathname) {
+  const decodedPathname = decodeURIComponent(pathname);
+  return decodedPathname === "/" ? "/index.html" : decodedPathname;
+}
+
+function decodeBase64(value) {
+  const binary = atob(value);
+  const bytes = new Uint8Array(binary.length);
+
+  for (let index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return bytes;
 }
 
 function assertJsonRequest(request) {
@@ -207,3 +249,58 @@ await writeFile(
 );
 
 console.log(`Built VitalCap deploy bundle at ${outputDir}`);
+
+async function buildStaticAssets(sourceDir) {
+  const assets = {};
+
+  await walkStaticAssets(sourceDir, sourceDir, assets);
+
+  return assets;
+}
+
+async function walkStaticAssets(sourceDir, currentDir, assets) {
+  const entries = await readdir(currentDir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const entryPath = resolve(currentDir, entry.name);
+
+    if (entry.isDirectory()) {
+      await walkStaticAssets(sourceDir, entryPath, assets);
+      continue;
+    }
+
+    if (!entry.isFile()) {
+      continue;
+    }
+
+    const pathname = `/${relative(sourceDir, entryPath).split(sep).join("/")}`;
+    const fileBody = await readFile(entryPath);
+
+    assets[pathname] = {
+      body: fileBody.toString("base64"),
+      cacheControl: getStaticCacheControl(entryPath),
+      contentType: getMimeType(entryPath)
+    };
+  }
+}
+
+function getMimeType(filePath) {
+  const mimeTypes = {
+    ".css": "text/css; charset=utf-8",
+    ".html": "text/html; charset=utf-8",
+    ".js": "text/javascript; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".png": "image/png",
+    ".svg": "image/svg+xml; charset=utf-8",
+    ".txt": "text/plain; charset=utf-8",
+    ".webp": "image/webp"
+  };
+
+  return mimeTypes[extname(filePath).toLowerCase()] || "application/octet-stream";
+}
+
+function getStaticCacheControl(filePath) {
+  return [".css", ".html", ".js"].includes(extname(filePath).toLowerCase())
+    ? "no-store"
+    : "public, max-age=3600";
+}
