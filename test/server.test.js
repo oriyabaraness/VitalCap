@@ -11,11 +11,12 @@ test("GET / serves the VitalCap site", async (t) => {
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type"), /text\/html/);
   assert.match(body, /VitalCap/);
-  assert.match(body, /AI Business Continuity Planning/);
-  assert.match(body, /Run a domino-effect continuity scenario/);
-  assert.match(body, /Application options/);
-  assert.match(body, /Dependency domino path/);
-  assert.match(body, /Live regional threat monitor/);
+  assert.match(body, /lang="he" dir="rtl"/);
+  assert.match(body, /תכנון רציפות עסקית מבוסס AI/);
+  assert.match(body, /הריצו תרחיש רציפות של אפקט דומינו/);
+  assert.match(body, /אפשרויות אפליקציה/);
+  assert.match(body, /נתיב דומינו של תלויות/);
+  assert.match(body, /ניטור איומים אזורי חי/);
 });
 
 test("GET static assets serves PDF-derived site images", async (t) => {
