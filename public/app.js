@@ -1,3 +1,56 @@
+const i18n = window.VitalCapI18n;
+let currentLanguage = i18n?.getLanguage() || "he";
+let selectedRiskTime = "4";
+
+const dynamicCopy = {
+  he: {
+    apiOnline: (serviceName) => `${serviceName} פעיל`,
+    apiUnavailable: "API לא זמין",
+    applicationTitle: (processName) => `אפליקציות עבור ${processName}`,
+    context: (region, application) => `${region.name} מוסיפה ${region.note}; ${application.dependency}`,
+    action: (threat, application, rto, rpo) =>
+      `${threat.action} תעדפו את התאוששות ${application.name} בתוך ${formatHours(rto)}, עם אובדן נתונים מתחת ל-${formatHours(rpo)}.`,
+    riskBands: {
+      critical: "סיכון רציפות קריטי",
+      high: "סיכון רציפות גבוה",
+      elevated: "סיכון רציפות מוגבר",
+      controlled: "סיכון רציפות בשליטה"
+    },
+    internal: "פנימי",
+    external: "חיצוני",
+    depth: (fallenCount, pathLength) => `${fallenCount} מתוך ${pathLength} תלויות הושפעו`,
+    recoveryWindow: (rto, rpo) => `${formatCompactHours(rto)} RTO / ${formatCompactHours(rpo)} RPO`,
+    dominoStatus: {
+      fallen: "הושפע",
+      risk: "בסיכון",
+      stable: "יציב"
+    }
+  },
+  en: {
+    apiOnline: (serviceName) => `${serviceName} online`,
+    apiUnavailable: "API unavailable",
+    applicationTitle: (processName) => `${processName} applications`,
+    context: (region, application) => `${region.name} adds ${region.note}; ${application.dependency}`,
+    action: (threat, application, rto, rpo) =>
+      `${threat.action} Prioritize ${application.name} recovery inside ${formatHours(rto)} with data loss under ${formatHours(rpo)}.`,
+    riskBands: {
+      critical: "Critical continuity risk",
+      high: "High continuity risk",
+      elevated: "Elevated continuity risk",
+      controlled: "Controlled continuity risk"
+    },
+    internal: "Internal",
+    external: "External",
+    depth: (fallenCount, pathLength) => `${fallenCount} of ${pathLength} dependencies impacted`,
+    recoveryWindow: (rto, rpo) => `${formatCompactHours(rto)} RTO / ${formatCompactHours(rpo)} RPO`,
+    dominoStatus: {
+      fallen: "Impacted",
+      risk: "At risk",
+      stable: "Stable"
+    }
+  }
+};
+
 const riskModels = {
   4: {
     mad: "4 שעות",
@@ -305,6 +358,15 @@ simulatorOutput.dominoReplay?.addEventListener("click", () => {
   }
 });
 
+window.addEventListener("vitalcap:languagechange", (event) => {
+  currentLanguage = event.detail.language;
+  setRiskModel(selectedRiskTime);
+  renderApplicationOptions();
+  updateSimulator();
+  setThreatStep(threatStepIndex);
+  setApiStatus();
+});
+
 setRiskModel("4");
 renderApplicationOptions();
 updateSimulator();
@@ -313,6 +375,7 @@ setApiStatus();
 
 function setRiskModel(time) {
   const model = riskModels[time] || riskModels[4];
+  selectedRiskTime = String(time);
 
   for (const segment of segments) {
     segment.classList.toggle("is-active", segment.dataset.time === time);
@@ -324,7 +387,7 @@ function setRiskModel(time) {
   }
 
   if (madOutput) {
-    madOutput.textContent = model.mad;
+    madOutput.textContent = formatHours(Number(time));
   }
 }
 
@@ -341,9 +404,9 @@ async function setApiStatus() {
     }
 
     const body = await response.json();
-    apiStatus.textContent = `${body.service.name} פעיל`;
+    apiStatus.textContent = getCopy().apiOnline(body.service.name);
   } catch {
-    apiStatus.textContent = "API לא זמין";
+    apiStatus.textContent = getCopy().apiUnavailable;
   }
 }
 
@@ -355,10 +418,11 @@ function updateSimulator() {
     return;
   }
 
-  const process = simulatorModels.processes[processInput.value] || simulatorModels.processes.sales;
+  const localizedSimulatorModels = getSimulatorModels();
+  const process = localizedSimulatorModels.processes[processInput.value] || localizedSimulatorModels.processes.sales;
   const application = getSelectedApplication(process);
-  const region = simulatorModels.regions[regionInput.value] || simulatorModels.regions.telaviv;
-  const threat = simulatorModels.threats[threatInput.value] || simulatorModels.threats.appOutage;
+  const region = localizedSimulatorModels.regions[regionInput.value] || localizedSimulatorModels.regions.telaviv;
+  const threat = localizedSimulatorModels.threats[threatInput.value] || localizedSimulatorModels.threats.appOutage;
   const workforce = Number(workforceInput.value);
   const supplier = Number(supplierInput.value);
   const score = clamp(
@@ -388,8 +452,8 @@ function updateSimulator() {
   simulatorOutput.rpo.textContent = formatHours(rpo);
   simulatorOutput.mad.textContent = formatHours(mad);
   simulatorOutput.dependency.textContent = `${process.name}: ${application.name}`;
-  simulatorOutput.context.textContent = `${region.name} מוסיפה ${region.note}; ${application.dependency}`;
-  simulatorOutput.action.textContent = `${threat.action} תעדפו את התאוששות ${application.name} בתוך ${formatHours(rto)}, עם אובדן נתונים מתחת ל-${formatHours(rpo)}.`;
+  simulatorOutput.context.textContent = getCopy().context(region, application);
+  simulatorOutput.action.textContent = getCopy().action(threat, application, rto, rpo);
   updateDominoCascade({ process, application, threat, score, rto, rpo });
 }
 
@@ -401,10 +465,11 @@ function renderApplicationOptions() {
     return;
   }
 
-  const process = simulatorModels.processes[processInput.value] || simulatorModels.processes.sales;
+  const localizedSimulatorModels = getSimulatorModels();
+  const process = localizedSimulatorModels.processes[processInput.value] || localizedSimulatorModels.processes.sales;
   const selectedKey = getSelectedApplication(process).key;
 
-  simulatorOutput.applicationTitle.textContent = `אפליקציות עבור ${process.name}`;
+  simulatorOutput.applicationTitle.textContent = getCopy().applicationTitle(process.name);
   container.innerHTML = "";
 
   for (const application of process.apps) {
@@ -452,18 +517,18 @@ function getSelectedApplication(process) {
 
 function getRiskBand(score) {
   if (score >= 82) {
-    return "סיכון רציפות קריטי";
+    return getCopy().riskBands.critical;
   }
 
   if (score >= 64) {
-    return "סיכון רציפות גבוה";
+    return getCopy().riskBands.high;
   }
 
   if (score >= 42) {
-    return "סיכון רציפות מוגבר";
+    return getCopy().riskBands.elevated;
   }
 
-  return "סיכון רציפות בשליטה";
+  return getCopy().riskBands.controlled;
 }
 
 function updateDominoCascade({ process, application, threat, score, rto, rpo }) {
@@ -474,7 +539,7 @@ function updateDominoCascade({ process, application, threat, score, rto, rpo }) 
     },
     ...process.dominoPath.map((label, index) => ({
       label,
-      type: index < 2 ? "פנימי" : "חיצוני"
+      type: index < 2 ? getCopy().internal : getCopy().external
     }))
   ];
   const impactRatio = clamp((score - 25) / 75, 0.18, 1);
@@ -498,8 +563,8 @@ function updateDominoCascade({ process, application, threat, score, rto, rpo }) 
   latestDominoState = {
     nodes,
     firstImpact: path[0].label,
-    depth: `${fallenCount} מתוך ${path.length} תלויות הושפעו`,
-    recoveryWindow: `${formatCompactHours(rto)} RTO / ${formatCompactHours(rpo)} RPO`,
+    depth: getCopy().depth(fallenCount, path.length),
+    recoveryWindow: getCopy().recoveryWindow(rto, rpo),
     threatName: threat.name
   };
 
@@ -538,22 +603,46 @@ function renderDominoCascade(state) {
 
 function getDominoStatusLabel(status) {
   if (status === "fallen") {
-    return "הושפע";
+    return getCopy().dominoStatus.fallen;
   }
 
   if (status === "risk") {
-    return "בסיכון";
+    return getCopy().dominoStatus.risk;
   }
 
-  return "יציב";
+  return getCopy().dominoStatus.stable;
 }
 
 function formatHours(value) {
+  if (currentLanguage === "en") {
+    return `${value} ${value === 1 ? "hour" : "hours"}`;
+  }
+
   return `${value} ${value === 1 ? "שעה" : "שעות"}`;
 }
 
 function formatCompactHours(value) {
-  return `${value}ש׳`;
+  return currentLanguage === "en" ? `${value}h` : `${value}ש׳`;
+}
+
+function getCopy() {
+  return dynamicCopy[currentLanguage] || dynamicCopy.he;
+}
+
+function getSimulatorModels() {
+  if (currentLanguage === "en" && i18n?.simulatorModels?.en) {
+    return i18n.simulatorModels.en;
+  }
+
+  return simulatorModels;
+}
+
+function getThreatSteps() {
+  if (currentLanguage === "en" && i18n?.threatSteps?.en) {
+    return i18n.threatSteps.en;
+  }
+
+  return threatSteps;
 }
 
 function clamp(value, min, max) {
@@ -567,14 +656,14 @@ function startThreatAnimation() {
 
   setThreatStep(0);
   setInterval(() => {
-    threatStepIndex = (threatStepIndex + 1) % threatSteps.length;
+    threatStepIndex = (threatStepIndex + 1) % getThreatSteps().length;
     setThreatStep(threatStepIndex);
   }, 2400);
 }
 
 function setThreatStep(index) {
   const stepNumber = String(index + 1);
-  const step = threatSteps[index];
+  const step = getThreatSteps()[index] || getThreatSteps()[0];
 
   for (const card of threatAnimation.cards) {
     card.classList.toggle("is-active", card.dataset.threatStep === stepNumber);

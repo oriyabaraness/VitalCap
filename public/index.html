@@ -10,7 +10,8 @@
     >
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="styles.css?v=20260805-live-threat">
-    <script src="app.js?v=20260805-live-threat" defer></script>
+    <script src="i18n.js?v=20260811-bilingual" defer></script>
+    <script src="app.js?v=20260811-bilingual" defer></script>
   </head>
   <body>
     <header class="site-header" aria-label="ניווט ראשי">
@@ -22,7 +23,13 @@
         <a href="#founder">מייסדת</a>
         <a href="#simulator">סימולטור</a>
       </nav>
-      <a class="header-link" href="#contact">צור קשר</a>
+      <div class="header-actions">
+        <div class="language-toggle" role="group" aria-label="בחירת שפה">
+          <button class="language-option is-active" type="button" data-language-option="he" aria-pressed="true">עברית</button>
+          <button class="language-option" type="button" data-language-option="en" aria-pressed="false">English</button>
+        </div>
+        <a class="header-link" href="#contact">צור קשר</a>
+      </div>
     </header>
 
     <main id="top">

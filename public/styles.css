@@ -91,6 +91,43 @@ a {
   white-space: nowrap;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: end;
+  gap: 14px;
+}
+
+.language-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(56px, 1fr));
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: white;
+}
+
+.language-option {
+  min-height: 34px;
+  padding: 0 10px;
+  border: 0;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.language-option + .language-option {
+  border-inline-start: 1px solid var(--line);
+}
+
+.language-option.is-active {
+  color: white;
+  background: var(--blue);
+}
+
 .hero {
   position: relative;
   min-height: calc(100vh - 72px);
@@ -1381,6 +1418,20 @@ tbody tr:last-child td {
 
   .header-link {
     font-size: 0.9rem;
+  }
+
+  .header-actions {
+    gap: 8px;
+  }
+
+  .language-toggle {
+    grid-template-columns: repeat(2, minmax(48px, 1fr));
+  }
+
+  .language-option {
+    min-height: 32px;
+    padding: 0 8px;
+    font-size: 0.76rem;
   }
 
   .hero {
