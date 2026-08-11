@@ -1,20 +1,20 @@
 const riskModels = {
   4: {
-    mad: "4 Hours",
+    mad: "4 שעות",
     reputational: 18,
     legal: 70,
     regulatory: 22,
     internal: 88
   },
   24: {
-    mad: "24 Hours",
+    mad: "24 שעות",
     reputational: 28,
     legal: 76,
     regulatory: 36,
     internal: 92
   },
   48: {
-    mad: "48 Hours",
+    mad: "48 שעות",
     reputational: 34,
     legal: 82,
     regulatory: 42,
@@ -65,221 +65,221 @@ let latestDominoState;
 let threatStepIndex = 0;
 const threatSteps = [
   {
-    title: "Scanning Shibuya region",
-    detail: "Language model flags seismic chatter, transport alerts, and local infrastructure updates."
+    title: "סורק את אזור שיבויה",
+    detail: "מודל השפה מסמן שיח סייסמי, התראות תחבורה ועדכוני תשתית מקומיים."
   },
   {
-    title: "Supplier exposure found",
-    detail: "CyberAgent headquarters and primary supplier locations are matched to the affected region."
+    title: "נמצאה חשיפת ספק",
+    detail: "מטה CyberAgent ואתרי ספקים מרכזיים מותאמים לאזור המושפע."
   },
   {
-    title: "Dependency chain connected",
-    detail: "Sales payment transfers are linked to client accounts, reporting, liquidity, and legal review."
+    title: "שרשרת התלויות חוברה",
+    detail: "העברות תשלומי מכירות מקושרות לחשבונות לקוחות, דיווח, נזילות ובדיקה משפטית."
   },
   {
-    title: "Continuity warning issued",
-    detail: "RTO, RPO, and MAD thresholds are escalated before the disruption reaches the franchise."
+    title: "אזהרת רציפות הופעלה",
+    detail: "ספי RTO, RPO ו-MAD מועלים לטיפול לפני שהשיבוש מגיע לשלוחה."
   }
 ];
 
 const simulatorModels = {
   processes: {
     sales: {
-      name: "Sales settlement",
-      dependency: "Payments, liquidity, client accounts, Salesforce, reporting, and legal review.",
+      name: "סגירת מכירות",
+      dependency: "תשלומים, נזילות, חשבונות לקוחות, Salesforce, דיווח ובדיקה משפטית.",
       baseRisk: 34,
       rto: 4,
       rpo: 2,
       mad: 4,
-      dominoPath: ["Liquidity", "Client Accounts", "Sales", "Reporting", "Legal"],
+      dominoPath: ["נזילות", "חשבונות לקוחות", "מכירות", "דיווח", "משפטי"],
       apps: [
         {
           key: "salesforce",
           name: "Salesforce Einstein",
-          category: "CRM automation",
+          category: "אוטומציית CRM",
           rto: 4,
           rpo: 2,
           mad: 4,
           risk: 14,
-          dependency: "Predictive lead scoring, forecasting, and customer insight automation."
+          dependency: "דירוג לידים חזוי, תחזיות ואוטומציית תובנות לקוח."
         },
         {
           key: "cyberagent",
           name: "CyberAgent Sales Cloud",
-          category: "Sales reporting",
+          category: "דיווח מכירות",
           rto: 4,
           rpo: 2,
           mad: 4,
           risk: 18,
-          dependency: "Payment transfer reporting, sales settlements, and client account visibility."
+          dependency: "דיווח העברות תשלום, סגירת מכירות ונראות חשבונות לקוחות."
         },
         {
           key: "hubspot-sales",
           name: "HubSpot Sales Hub",
-          category: "Pipeline continuity",
+          category: "רציפות צבר מכירות",
           rto: 8,
           rpo: 4,
           mad: 12,
           risk: 10,
-          dependency: "Deal pipeline, automated outreach, and customer communication history."
+          dependency: "צבר עסקאות, פנייה אוטומטית והיסטוריית תקשורת עם לקוחות."
         }
       ]
     },
     payments: {
-      name: "Vendor payments",
-      dependency: "Treasury approvals, bank portals, ERP data, and supplier operations.",
+      name: "תשלומים לספקים",
+      dependency: "אישורי גזברות, פורטלי בנק, נתוני ERP ותפעול ספקים.",
       baseRisk: 31,
       rto: 6,
       rpo: 4,
       mad: 8,
-      dominoPath: ["Supplier Master", "Treasury", "Bank Portal", "Payments", "Ledger", "Reporting"],
+      dominoPath: ["מאגר ספקים", "גזברות", "פורטל בנק", "תשלומים", "ספר ראשי", "דיווח"],
       apps: [
         {
           key: "blackline",
           name: "BlackLine Transaction Matching",
-          category: "Reconciliation",
+          category: "התאמות",
           rto: 2,
           rpo: 5,
           mad: 2,
           risk: 19,
-          dependency: "Transaction matching, reconciliations, journal entries, and finance controls."
+          dependency: "התאמת עסקאות, התאמות חשבונאיות, פקודות יומן ובקרות פיננסיות."
         },
         {
           key: "kyriba",
           name: "Kyriba Treasury",
-          category: "Treasury operations",
+          category: "תפעול גזברות",
           rto: 6,
           rpo: 4,
           mad: 8,
           risk: 16,
-          dependency: "Bank connectivity, liquidity visibility, payment files, and treasury approval paths."
+          dependency: "קישוריות בנקאית, נראות נזילות, קבצי תשלום ונתיבי אישור גזברות."
         },
         {
           key: "sap-finance",
           name: "SAP S/4HANA Finance",
-          category: "ERP finance",
+          category: "ERP פיננסי",
           rto: 8,
           rpo: 4,
           mad: 12,
           risk: 13,
-          dependency: "Vendor master data, accounts payable, purchase orders, and ledger posting."
+          dependency: "נתוני אב של ספקים, חשבונות לתשלום, הזמנות רכש ורישום לספר הראשי."
         }
       ]
     },
     reporting: {
-      name: "Client reporting",
-      dependency: "Data warehouse, sales feeds, compliance checks, and communications review.",
+      name: "דיווח ללקוחות",
+      dependency: "מחסן נתונים, הזנות מכירות, בדיקות ציות ובדיקת תקשורת.",
       baseRisk: 26,
       rto: 12,
       rpo: 6,
       mad: 24,
-      dominoPath: ["Sales Feeds", "Data Warehouse", "Analytics", "Client Reporting", "Compliance", "Communications"],
+      dominoPath: ["הזנות מכירות", "מחסן נתונים", "אנליטיקה", "דיווח ללקוחות", "ציות", "תקשורת"],
       apps: [
         {
           key: "tableau",
           name: "Tableau Cloud",
-          category: "BI dashboards",
+          category: "דשבורדי BI",
           rto: 12,
           rpo: 6,
           mad: 24,
           risk: 12,
-          dependency: "Executive dashboards, sales reporting, and recurring client views."
+          dependency: "דשבורדים ניהוליים, דיווח מכירות ותצוגות לקוח חוזרות."
         },
         {
           key: "powerbi",
           name: "Power BI Service",
-          category: "Analytics",
+          category: "אנליטיקה",
           rto: 10,
           rpo: 6,
           mad: 18,
           risk: 11,
-          dependency: "Dataset refreshes, report publishing, and operational KPI monitoring."
+          dependency: "רענון מערכי נתונים, פרסום דוחות וניטור KPI תפעולי."
         },
         {
           key: "snowflake",
           name: "Snowflake Data Cloud",
-          category: "Data platform",
+          category: "פלטפורמת נתונים",
           rto: 8,
           rpo: 4,
           mad: 12,
           risk: 17,
-          dependency: "Sales feeds, historical reporting data, and downstream analytics jobs."
+          dependency: "הזנות מכירות, נתוני דיווח היסטוריים ומשימות אנליטיקה בהמשך השרשרת."
         }
       ]
     },
     payroll: {
-      name: "Payroll processing",
-      dependency: "HR records, payroll provider, finance approval, and employee communications.",
+      name: "עיבוד שכר",
+      dependency: "רשומות HR, ספק שכר, אישור פיננסי ותקשורת עובדים.",
       baseRisk: 29,
       rto: 24,
       rpo: 8,
       mad: 24,
-      dominoPath: ["HR Records", "Payroll Provider", "Finance Approval", "Payroll", "Employee Comms", "Legal"],
+      dominoPath: ["רשומות HR", "ספק שכר", "אישור פיננסי", "שכר", "תקשורת עובדים", "משפטי"],
       apps: [
         {
           key: "workday",
           name: "Workday HCM",
-          category: "HR operations",
+          category: "תפעול HR",
           rto: 72,
           rpo: 4,
           mad: 4,
           risk: 15,
-          dependency: "Employee data, payroll workflows, recruitment records, and HR approvals."
+          dependency: "נתוני עובדים, תהליכי שכר, רשומות גיוס ואישורי HR."
         },
         {
           key: "adp",
           name: "ADP Workforce Now",
-          category: "Payroll provider",
+          category: "ספק שכר",
           rto: 24,
           rpo: 8,
           mad: 24,
           risk: 14,
-          dependency: "Payroll runs, tax files, direct deposit files, and employee pay statements."
+          dependency: "הרצות שכר, קבצי מס, קבצי הפקדה ישירה ותלושי שכר לעובדים."
         },
         {
           key: "deel",
           name: "Deel Payroll",
-          category: "Global payroll",
+          category: "שכר גלובלי",
           rto: 24,
           rpo: 6,
           mad: 24,
           risk: 12,
-          dependency: "International contractor payroll, compliance docs, and worker communications."
+          dependency: "שכר קבלנים בינלאומי, מסמכי ציות ותקשורת עם עובדים."
         }
       ]
     }
   },
   regions: {
-    telaviv: { name: "Tel Aviv", risk: 9, note: "regional security and transport sensitivity" },
-    shibuya: { name: "Shibuya", risk: 16, note: "seismic and data center exposure" },
-    toronto: { name: "Toronto", risk: 7, note: "weather and vendor concentration exposure" },
-    london: { name: "London", risk: 10, note: "regulatory and market infrastructure sensitivity" }
+    telaviv: { name: "תל אביב", risk: 9, note: "רגישות ביטחונית ותחבורתית אזורית" },
+    shibuya: { name: "שיבויה", risk: 16, note: "חשיפה סייסמית וחשיפת מרכזי נתונים" },
+    toronto: { name: "טורונטו", risk: 7, note: "חשיפת מזג אוויר וריכוז ספקים" },
+    london: { name: "לונדון", risk: 10, note: "רגישות רגולטורית ותשתיות שוק" }
   },
   threats: {
     appOutage: {
-      name: "Critical app outage",
+      name: "השבתת אפליקציה קריטית",
       risk: 22,
-      action: "Activate backup workflows, freeze non-critical changes, and prioritize application restoration."
+      action: "הפעילו תהליכי גיבוי, הקפיאו שינויים שאינם קריטיים ותעדפו שחזור אפליקציה."
     },
     earthquake: {
-      name: "Regional seismic event",
+      name: "אירוע סייסמי אזורי",
       risk: 28,
-      action: "Confirm staff safety, shift processing to an alternate region, and monitor supplier facilities."
+      action: "אשרו את בטיחות העובדים, העבירו עיבוד לאזור חלופי ונטרו מתקני ספקים."
     },
     supplier: {
-      name: "Supplier disruption",
+      name: "שיבוש אצל ספק",
       risk: 20,
-      action: "Move to pre-approved suppliers and trigger procurement and client communication paths."
+      action: "עברו לספקים מאושרים מראש והפעילו נתיבי רכש ותקשורת לקוחות."
     },
     flood: {
-      name: "Data center flood risk",
+      name: "סיכון הצפה במרכז נתונים",
       risk: 25,
-      action: "Validate replication, route workloads away from exposed infrastructure, and increase backup frequency."
+      action: "אמתו רפליקציה, נתבו עומסים הרחק מתשתית חשופה והגדילו תדירות גיבוי."
     },
     workforce: {
-      name: "Workforce disruption",
+      name: "שיבוש בכוח האדם",
       risk: 18,
-      action: "Move critical tasks to trained backups and simplify approvals for the active recovery window."
+      action: "העבירו משימות קריטיות למחליפים מיומנים ופשטו אישורים לחלון ההתאוששות הפעיל."
     }
   }
 };
@@ -341,9 +341,9 @@ async function setApiStatus() {
     }
 
     const body = await response.json();
-    apiStatus.textContent = `${body.service.name} online`;
+    apiStatus.textContent = `${body.service.name} פעיל`;
   } catch {
-    apiStatus.textContent = "API unavailable";
+    apiStatus.textContent = "API לא זמין";
   }
 }
 
@@ -384,12 +384,12 @@ function updateSimulator() {
   simulatorOutput.score.textContent = score;
   simulatorOutput.band.textContent = getRiskBand(score);
   simulatorOutput.meter.style.width = `${score}%`;
-  simulatorOutput.rto.textContent = `${rto} ${pluralizeHour(rto)}`;
-  simulatorOutput.rpo.textContent = `${rpo} ${pluralizeHour(rpo)}`;
-  simulatorOutput.mad.textContent = `${mad} ${pluralizeHour(mad)}`;
+  simulatorOutput.rto.textContent = formatHours(rto);
+  simulatorOutput.rpo.textContent = formatHours(rpo);
+  simulatorOutput.mad.textContent = formatHours(mad);
   simulatorOutput.dependency.textContent = `${process.name}: ${application.name}`;
-  simulatorOutput.context.textContent = `${region.name} adds ${region.note}; ${application.dependency}`;
-  simulatorOutput.action.textContent = `${threat.action} Prioritize ${application.name} recovery inside ${rto} ${pluralizeHour(rto)} with data loss under ${rpo} ${pluralizeHour(rpo)}.`;
+  simulatorOutput.context.textContent = `${region.name} מוסיפה ${region.note}; ${application.dependency}`;
+  simulatorOutput.action.textContent = `${threat.action} תעדפו את התאוששות ${application.name} בתוך ${formatHours(rto)}, עם אובדן נתונים מתחת ל-${formatHours(rpo)}.`;
   updateDominoCascade({ process, application, threat, score, rto, rpo });
 }
 
@@ -404,7 +404,7 @@ function renderApplicationOptions() {
   const process = simulatorModels.processes[processInput.value] || simulatorModels.processes.sales;
   const selectedKey = getSelectedApplication(process).key;
 
-  simulatorOutput.applicationTitle.textContent = `${process.name} applications`;
+  simulatorOutput.applicationTitle.textContent = `אפליקציות עבור ${process.name}`;
   container.innerHTML = "";
 
   for (const application of process.apps) {
@@ -418,9 +418,9 @@ function renderApplicationOptions() {
       <strong>${application.name}</strong>
       <span>${application.category}</span>
       <span class="application-meta">
-        <em>RTO ${application.rto}h</em>
-        <em>RPO ${application.rpo}h</em>
-        <em>MAD ${application.mad}h</em>
+        <em>RTO ${formatCompactHours(application.rto)}</em>
+        <em>RPO ${formatCompactHours(application.rpo)}</em>
+        <em>MAD ${formatCompactHours(application.mad)}</em>
       </span>
     `;
     option.classList.toggle("is-selected", application.key === selectedKey);
@@ -452,18 +452,18 @@ function getSelectedApplication(process) {
 
 function getRiskBand(score) {
   if (score >= 82) {
-    return "Critical continuity risk";
+    return "סיכון רציפות קריטי";
   }
 
   if (score >= 64) {
-    return "High continuity risk";
+    return "סיכון רציפות גבוה";
   }
 
   if (score >= 42) {
-    return "Elevated continuity risk";
+    return "סיכון רציפות מוגבר";
   }
 
-  return "Controlled continuity risk";
+  return "סיכון רציפות בשליטה";
 }
 
 function updateDominoCascade({ process, application, threat, score, rto, rpo }) {
@@ -474,7 +474,7 @@ function updateDominoCascade({ process, application, threat, score, rto, rpo }) 
     },
     ...process.dominoPath.map((label, index) => ({
       label,
-      type: index < 2 ? "Internal" : "External"
+      type: index < 2 ? "פנימי" : "חיצוני"
     }))
   ];
   const impactRatio = clamp((score - 25) / 75, 0.18, 1);
@@ -498,8 +498,8 @@ function updateDominoCascade({ process, application, threat, score, rto, rpo }) 
   latestDominoState = {
     nodes,
     firstImpact: path[0].label,
-    depth: `${fallenCount} of ${path.length} dependencies impacted`,
-    recoveryWindow: `${rto}h RTO / ${rpo}h RPO`,
+    depth: `${fallenCount} מתוך ${path.length} תלויות הושפעו`,
+    recoveryWindow: `${formatCompactHours(rto)} RTO / ${formatCompactHours(rpo)} RPO`,
     threatName: threat.name
   };
 
@@ -538,18 +538,22 @@ function renderDominoCascade(state) {
 
 function getDominoStatusLabel(status) {
   if (status === "fallen") {
-    return "Impacted";
+    return "הושפע";
   }
 
   if (status === "risk") {
-    return "At risk";
+    return "בסיכון";
   }
 
-  return "Stable";
+  return "יציב";
 }
 
-function pluralizeHour(value) {
-  return value === 1 ? "hour" : "hours";
+function formatHours(value) {
+  return `${value} ${value === 1 ? "שעה" : "שעות"}`;
+}
+
+function formatCompactHours(value) {
+  return `${value}ש׳`;
 }
 
 function clamp(value, min, max) {
