@@ -11,6 +11,7 @@ test("GET / serves the VitalCap site", async (t) => {
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type"), /text\/html/);
   assert.match(body, /VitalCap/);
+  assert.match(body, /<a class="brand" href="#top" aria-label="דף הבית של VitalCap">VC<\/a>/);
   assert.match(body, /lang="he" dir="rtl"/);
   assert.match(body, /i18n\.js\?v=20260812-about/);
   assert.match(body, /data-language-option="en"/);
