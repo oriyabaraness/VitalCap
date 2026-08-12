@@ -17,6 +17,7 @@ const pageMeta = {
 };
 
 const staticTextTranslations = {
+  "עלינו": "About",
   "פלטפורמה": "Platform",
   "תהליך עבודה": "Workflow",
   "סיכון": "Risk",
@@ -34,6 +35,18 @@ const staticTextTranslations = {
   "עובדים, אפליקציות ואיומים": "People, apps, threats",
   "סטטוס": "Status",
   "בודק API": "Checking API",
+  "על VitalCap": "About VitalCap",
+  "פלטפורמת רציפות שמחברת אנשים, תהליכים, אפליקציות ואיומים.":
+    "A continuity platform that connects people, processes, applications, and threats.",
+  "מה VitalCap עושה": "What VitalCap does",
+  "VitalCap הופכת תוכניות רציפות עסקית ממסמכים סטטיים למערכת חיה שמחשבת השפעה, מזהה תלויות ומציעה פעולות התאוששות.":
+    "VitalCap turns business continuity plans from static documents into a live system that calculates impact, identifies dependencies, and recommends recovery actions.",
+  "למי זה מיועד": "Who it is for",
+  "הפתרון מיועד לצוותי רציפות, סיכונים ותפעול שצריכים להבין במהירות אילו תהליכים, ספקים ואפליקציות עלולים לעצור את העסק.":
+    "The solution is built for continuity, risk, and operations teams that need to quickly understand which processes, suppliers, and applications could stop the business.",
+  "איך זה עוזר": "How it helps",
+  "המערכת משלבת RTO, RPO, MAD, קריטיות עובדים ואותות איומים כדי לעזור לצוותים לתעדף תגובה לפני שהשיבוש מתרחב.":
+    "The system combines RTO, RPO, MAD, employee criticality, and threat signals to help teams prioritize response before disruption spreads.",
   "היכרות": "Introduction",
   "נבנה מתוך ניסיון ברציפות ובניהול סיכונים.": "Built by continuity and risk experience.",
   "אוריה ברנס היא מקצוענית בתחומי אבטחה וניהול סיכונים, עם התמחות ברציפות עסקית ובהתאוששות מאסון. עבודתה כוללת תיאום רציפות, הגנת תשתיות ותכנון חוסן מעשי.":

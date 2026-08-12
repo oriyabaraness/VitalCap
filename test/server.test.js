@@ -12,9 +12,11 @@ test("GET / serves the VitalCap site", async (t) => {
   assert.match(response.headers.get("content-type"), /text\/html/);
   assert.match(body, /VitalCap/);
   assert.match(body, /lang="he" dir="rtl"/);
-  assert.match(body, /i18n\.js\?v=20260811-bilingual/);
+  assert.match(body, /i18n\.js\?v=20260812-about/);
   assert.match(body, /data-language-option="en"/);
   assert.match(body, /תכנון רציפות עסקית מבוסס AI/);
+  assert.match(body, /href="#about"/);
+  assert.match(body, /על VitalCap/);
   assert.match(body, /הריצו תרחיש רציפות של אפקט דומינו/);
   assert.match(body, /אפשרויות אפליקציה/);
   assert.match(body, /נתיב דומינו של תלויות/);
